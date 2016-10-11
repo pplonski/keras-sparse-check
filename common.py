@@ -14,7 +14,7 @@ from keras.utils import np_utils
 # training parameters
 batch_size = 128
 nb_classes = 3
-nb_epoch = 10
+nb_epoch = 2
 # input image dimensions
 img_rows, img_cols = 32, 32
 # number of convolutional filters to use
@@ -24,6 +24,22 @@ nb_pool = 2
 # convolution kernel size
 nb_conv = 3
 
+# input files with dense matrices
+input_files = [ '/media/2t/CNN_DATA/subset_db_x_view_1_1000.npy', 
+                    '/media/2t/CNN_DATA/subset_db_x_view_1_2000.npy',
+                    '/media/2t/CNN_DATA/subset_db_x_view_1_3000.npy',
+                    '/media/2t/CNN_DATA/subset_db_x_view_1_4000.npy',
+                    '/media/2t/CNN_DATA/subset_db_x_view_1_5000.npy',
+                    '/media/2t/CNN_DATA/subset_db_x_view_1_6000.npy',
+                    '/media/2t/CNN_DATA/subset_db_x_view_1_7000.npy',]
+
+y_input_files = ['/media/2t/CNN_DATA/subset_db_y_view_1_1000.npy', 
+                 '/media/2t/CNN_DATA/subset_db_y_view_1_2000.npy',
+                 '/media/2t/CNN_DATA/subset_db_y_view_1_3000.npy',
+                 '/media/2t/CNN_DATA/subset_db_y_view_1_4000.npy',
+                 '/media/2t/CNN_DATA/subset_db_y_view_1_5000.npy',
+                 '/media/2t/CNN_DATA/subset_db_y_view_1_6000.npy',
+                 '/media/2t/CNN_DATA/subset_db_y_view_1_7000.npy']
 
 # Keras network (simple architecture)
 def get_model():
@@ -47,11 +63,10 @@ def get_model():
 
 # return Y data
 def get_y_data():
-	y_input_files = ['/media/2t/CNN_DATA/subset_db_y_view_1_1000.npy', 
-                     '/media/2t/CNN_DATA/subset_db_y_view_1_2000.npy']
+    
     y = None
     for file_name in y_input_files:
-        print 'Reading from' file_name        
+        print 'Reading from', file_name        
         tmp = np.load(file_name)
         y = tmp if y is None else np.concatenate((y, tmp)) 
         del tmp
@@ -60,13 +75,10 @@ def get_y_data():
 
 # return X data as list of sparse metrices
 def get_x_data_sparse():
-    # input files with dense matrices
-    input_files = ['/media/2t/CNN_DATA/subset_db_x_view_1_1000.npy', 
-                   '/media/2t/CNN_DATA/subset_db_x_view_1_2000.npy']
     # array of sparse matrices 
     data = []
     for file_name in input_files:
-        print 'Reading from' file_name
+        print 'Reading from', file_name
         # temporary load as dense
         tmp = np.load(file_name)
         for i in xrange(0, tmp.shape[0]):
@@ -77,13 +89,10 @@ def get_x_data_sparse():
 
 # return X data as dense numpy array
 def get_x_data_dense():
-    # input files with dense matrices
-    input_files = ['/media/2t/CNN_DATA/subset_db_x_view_1_1000.npy', 
-                   '/media/2t/CNN_DATA/subset_db_x_view_1_2000.npy']
     # array of sparse matrices 
     data = None
     for file_name in input_files:
-        print 'Reading from' file_name
+        print 'Reading from', file_name
         # temporary load as dense
         tmp = np.load(file_name)
         data = tmp if data is None else np.concatenate((data, tmp))    
@@ -95,7 +104,7 @@ def get_x_data_dense():
 
 def split_data(X, y):
     # how to split data between training and validation
-    split_on = 500000
+    split_on = 2000000
     X_train = X[:split_on]
     X_test  = X[split_on:]
     Y_train = y[:split_on]
@@ -137,7 +146,7 @@ def sparse_generator(X, Y, batch_size=128, shuffle=True):
         np.random.shuffle(sample_index)
     img_rows = X[0].shape[0]
     img_cols = X[0].shape[1]
-    nb_classes = y.shape[1]
+    nb_classes = Y.shape[1]
     
     counter = 0
     while True:
